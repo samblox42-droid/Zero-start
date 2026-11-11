@@ -1,4 +1,4 @@
--- Sam's Music V6 - Final Clean Version (ohne X, ohne Sounds, mit Mülleimer)
+-- Sam's Music V6 - Clean Version (nur optisch verbessert + Dark/Light Mode)
 
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
@@ -12,6 +12,37 @@ local HttpService = game:GetService("HttpService")
 if CoreGui:FindFirstChild("SamMusicV6") then
     CoreGui:FindFirstChild("SamMusicV6"):Destroy()
 end
+
+-- ===================== THEME =====================
+local Themes = {
+    Dark = {
+        Bg          = Color3.fromRGB(14, 14, 18),
+        Secondary   = Color3.fromRGB(22, 22, 28),
+        Content     = Color3.fromRGB(18, 18, 24),
+        Button      = Color3.fromRGB(30, 30, 38),
+        ButtonHover = Color3.fromRGB(40, 40, 50),
+        Accent      = Color3.fromRGB(0, 255, 130),
+        Text        = Color3.fromRGB(235, 235, 245),
+        TextDark    = Color3.fromRGB(140, 140, 155),
+        Danger      = Color3.fromRGB(255, 55, 55),
+        Stroke      = Color3.fromRGB(0, 255, 130),
+    },
+    Light = {
+        Bg          = Color3.fromRGB(245, 245, 248),
+        Secondary   = Color3.fromRGB(230, 230, 236),
+        Content     = Color3.fromRGB(255, 255, 255),
+        Button      = Color3.fromRGB(220, 220, 228),
+        ButtonHover = Color3.fromRGB(205, 205, 215),
+        Accent      = Color3.fromRGB(0, 170, 90),
+        Text        = Color3.fromRGB(25, 25, 30),
+        TextDark    = Color3.fromRGB(90, 90, 105),
+        Danger      = Color3.fromRGB(220, 50, 50),
+        Stroke      = Color3.fromRGB(0, 170, 90),
+    }
+}
+
+local CurrentTheme = "Dark"
+local Theme = Themes.Dark
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "SamMusicV6"
@@ -36,15 +67,16 @@ end)
 
 -- Main Frame
 local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0, 400, 0, 300)
-Main.Position = UDim2.new(0.5, -200, 0.5, -150)
-Main.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
+Main.Size = UDim2.new(0, 410, 0, 310)
+Main.Position = UDim2.new(0.5, -205, 0.5, -155)
+Main.BackgroundColor3 = Theme.Bg
 Main.Parent = ScreenGui
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 
 local Stroke = Instance.new("UIStroke")
-Stroke.Color = Color3.fromRGB(0, 255, 120)
-Stroke.Thickness = 1.6
+Stroke.Color = Theme.Stroke
+Stroke.Thickness = 1.5
+Stroke.Transparency = 0.4
 Stroke.Parent = Main
 
 -- Particle Background
@@ -54,17 +86,17 @@ ParticleFrame.BackgroundTransparency = 1
 ParticleFrame.ClipsDescendants = true
 ParticleFrame.ZIndex = 0
 ParticleFrame.Parent = Main
-Instance.new("UICorner", ParticleFrame).CornerRadius = UDim.new(0,10)
+Instance.new("UICorner", ParticleFrame).CornerRadius = UDim.new(0,12)
 
 task.spawn(function()
-    while task.wait(0.4) do
+    while task.wait(0.45) do
         if not ParticleFrame.Parent then break end
         local p = Instance.new("Frame")
         local s = math.random(2,4)
         p.Size = UDim2.new(0,s,0,s)
         p.Position = UDim2.new(math.random(),0,1,0)
-        p.BackgroundColor3 = Color3.fromRGB(50,255,100)
-        p.BackgroundTransparency = 0.6
+        p.BackgroundColor3 = Theme.Accent
+        p.BackgroundTransparency = 0.55
         p.BorderSizePixel = 0
         Instance.new("UICorner", p).CornerRadius = UDim.new(1,0)
         p.Parent = ParticleFrame
@@ -78,34 +110,55 @@ end)
 
 -- Minimize Button
 local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Size = UDim2.new(0,22,0,22) MinimizeBtn.Position = UDim2.new(1,-48,0,5)
-MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255,170,0) MinimizeBtn.Text = "−"
-MinimizeBtn.TextColor3 = Color3.new(1,1,1) MinimizeBtn.Font = Enum.Font.GothamBold
-MinimizeBtn.TextSize = 16 MinimizeBtn.Parent = Main
-Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0,4)
+MinimizeBtn.Size = UDim2.new(0,24,0,24)
+MinimizeBtn.Position = UDim2.new(1,-52,0,6)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255,170,0)
+MinimizeBtn.Text = "−"
+MinimizeBtn.TextColor3 = Color3.new(1,1,1)
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 16
+MinimizeBtn.Parent = Main
+Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0,6)
 
 local MinIcon = Instance.new("TextButton")
-MinIcon.Size = UDim2.new(0,45,0,45) MinIcon.Position = UDim2.new(1,-55,0,15)
-MinIcon.BackgroundColor3 = Color3.fromRGB(0,255,120) MinIcon.Text = "🎵"
-MinIcon.TextColor3 = Color3.new(1,1,1) MinIcon.Font = Enum.Font.GothamBold
-MinIcon.TextSize = 22 MinIcon.Visible = false MinIcon.Parent = ScreenGui
+MinIcon.Size = UDim2.new(0,48,0,48)
+MinIcon.Position = UDim2.new(1,-58,0,18)
+MinIcon.BackgroundColor3 = Theme.Accent
+MinIcon.Text = "🎵"
+MinIcon.TextColor3 = Color3.new(1,1,1)
+MinIcon.Font = Enum.Font.GothamBold
+MinIcon.TextSize = 22
+MinIcon.Visible = false
+MinIcon.Parent = ScreenGui
 Instance.new("UICorner", MinIcon).CornerRadius = UDim.new(1,0)
 
-MinimizeBtn.MouseButton1Click:Connect(function() Main.Visible = false MinIcon.Visible = true end)
-MinIcon.MouseButton1Click:Connect(function() Main.Visible = true MinIcon.Visible = false end)
+MinimizeBtn.MouseButton1Click:Connect(function()
+    Main.Visible = false
+    MinIcon.Visible = true
+end)
+MinIcon.MouseButton1Click:Connect(function()
+    Main.Visible = true
+    MinIcon.Visible = false
+end)
 
--- Header (ohne X-Button)
+-- Header
 local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1,0,0,32) Header.BackgroundTransparency = 1 Header.Parent = Main
+Header.Size = UDim2.new(1,0,0,34)
+Header.BackgroundTransparency = 1
+Header.Parent = Main
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(0.8,0,1,0) Title.Position = UDim2.new(0,12,0,0)
+Title.Size = UDim2.new(0.75,0,1,0)
+Title.Position = UDim2.new(0,14,0,0)
 Title.BackgroundTransparency = 1
 Title.Text = "Sam's Music V6 | " .. LocalPlayer.Name
-Title.TextColor3 = Color3.new(1,1,1) Title.Font = Enum.Font.GothamBlack Title.TextSize = 12.5
-Title.TextXAlignment = Enum.TextXAlignment.Left Title.Parent = Header
+Title.TextColor3 = Theme.Text
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 13
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = Header
 
--- Drag (verschiebbare UI)
+-- Drag
 local dragging, dragInput, dragStart, startPos
 Header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -130,7 +183,7 @@ local function clickAnim(btn)
     local orig = btn.Size
     btn.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
-            TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(orig.X.Scale, orig.X.Offset-3, orig.Y.Scale, orig.Y.Offset-3)}):Play()
+            TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(orig.X.Scale, orig.X.Offset-2, orig.Y.Scale, orig.Y.Offset-2)}):Play()
         end
     end)
     btn.InputEnded:Connect(function(i)
@@ -140,43 +193,45 @@ local function clickAnim(btn)
     end)
 end
 
--- Tab System
+-- Tab System (untereinander)
 local TabButtons = Instance.new("Frame")
-TabButtons.Size = UDim2.new(0,105,1,-42)
-TabButtons.Position = UDim2.new(0,8,0,34)
+TabButtons.Size = UDim2.new(0,108,1,-46)
+TabButtons.Position = UDim2.new(0,8,0,38)
 TabButtons.BackgroundTransparency = 1
 TabButtons.Parent = Main
 
 local TabLayout = Instance.new("UIListLayout")
-TabLayout.Padding = UDim.new(0,6)
+TabLayout.Padding = UDim.new(0,7)
 TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
 TabLayout.Parent = TabButtons
 
 local ContentArea = Instance.new("Frame")
-ContentArea.Size = UDim2.new(1,-125,1,-42)
-ContentArea.Position = UDim2.new(0,118,0,34)
-ContentArea.BackgroundColor3 = Color3.fromRGB(18,18,22)
+ContentArea.Size = UDim2.new(1,-128,1,-46)
+ContentArea.Position = UDim2.new(0,122,0,38)
+ContentArea.BackgroundColor3 = Theme.Content
 ContentArea.Parent = Main
-Instance.new("UICorner", ContentArea).CornerRadius = UDim.new(0,8)
+Instance.new("UICorner", ContentArea).CornerRadius = UDim.new(0,10)
 
 local activePage = nil
+local TabBtnRefs = {}
 
 local function createTab(name, isFirst)
     local Btn = Instance.new("TextButton")
-    Btn.Size = UDim2.new(1,0,0,26)
-    Btn.BackgroundColor3 = Color3.fromRGB(25,25,30)
+    Btn.Size = UDim2.new(1,0,0,28)
+    Btn.BackgroundColor3 = Theme.Button
     Btn.BackgroundTransparency = isFirst and 0 or 1
     Btn.Text = name
-    Btn.TextColor3 = isFirst and Color3.fromRGB(0,255,120) or Color3.fromRGB(130,130,150)
+    Btn.TextColor3 = isFirst and Theme.Accent or Theme.TextDark
     Btn.Font = Enum.Font.GothamSemibold
-    Btn.TextSize = 10
+    Btn.TextSize = 11
     Btn.Parent = TabButtons
-    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0,5)
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0,6)
     clickAnim(Btn)
+    TabBtnRefs[name] = Btn
 
     local Page = Instance.new("Frame")
-    Page.Size = UDim2.new(1,-20,1,-12)
-    Page.Position = UDim2.new(0,10,0,6)
+    Page.Size = UDim2.new(1,-16,1,-12)
+    Page.Position = UDim2.new(0,8,0,6)
     Page.BackgroundTransparency = 1
     Page.Visible = isFirst
     Page.Parent = ContentArea
@@ -190,10 +245,16 @@ local function createTab(name, isFirst)
         end
         for _, b in pairs(TabButtons:GetChildren()) do
             if b:IsA("TextButton") then
-                TweenService:Create(b, TweenInfo.new(0.2), {BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(130,130,150)}):Play()
+                TweenService:Create(b, TweenInfo.new(0.18), {
+                    BackgroundTransparency = 1,
+                    TextColor3 = Theme.TextDark
+                }):Play()
             end
         end
-        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundTransparency = 0, TextColor3 = Color3.fromRGB(0,255,120)}):Play()
+        TweenService:Create(Btn, TweenInfo.new(0.18), {
+            BackgroundTransparency = 0,
+            TextColor3 = Theme.Accent
+        }):Play()
         Page.Visible = true
         activePage = Page
     end)
@@ -207,7 +268,26 @@ local SavedPage   = createTab("SAVED", false)
 local UpdatePage  = createTab("UPDATE", false)
 local CreditsPage = createTab("CREDITS", false)
 
--- ==================== BACKEND ====================
+-- ===================== THEME APPLY =====================
+local function ApplyTheme()
+    Theme = Themes[CurrentTheme]
+    Main.BackgroundColor3 = Theme.Bg
+    ContentArea.BackgroundColor3 = Theme.Content
+    Stroke.Color = Theme.Stroke
+    Title.TextColor3 = Theme.Text
+    MinIcon.BackgroundColor3 = Theme.Accent
+
+    for name, btn in pairs(TabBtnRefs) do
+        if btn.BackgroundTransparency < 0.5 then
+            btn.BackgroundColor3 = Theme.Button
+            btn.TextColor3 = Theme.Accent
+        else
+            btn.TextColor3 = Theme.TextDark
+        end
+    end
+end
+
+-- ==================== BACKEND (UNVERÄNDERT) ====================
 local RE = ReplicatedStorage:FindFirstChild("RE") or ReplicatedStorage:WaitForChild("RE", 5)
 local VehicleRemote = RE and RE:FindFirstChild("1NoMoto1rVehicle1s")
 local ClearRemote = RE and RE:FindFirstChild("1Clea1rTool1s")
@@ -272,55 +352,78 @@ end
 -- Vehicle Tab
 local function buildVehicleUI(page)
     local IDBox = Instance.new("TextBox")
-    IDBox.Size = UDim2.new(1,0,0,24) IDBox.Position = UDim2.new(0,0,0,5)
-    IDBox.BackgroundColor3 = Color3.fromRGB(25,25,30) IDBox.PlaceholderText = "Enter Audio ID..."
-    IDBox.Text = "" IDBox.TextColor3 = Color3.new(1,1,1) IDBox.Font = Enum.Font.Gotham
-    IDBox.TextSize = 11 IDBox.Parent = page
-    Instance.new("UICorner", IDBox).CornerRadius = UDim.new(0,4)
+    IDBox.Size = UDim2.new(1,0,0,26)
+    IDBox.Position = UDim2.new(0,0,0,4)
+    IDBox.BackgroundColor3 = Theme.Button
+    IDBox.PlaceholderText = "Enter Audio ID..."
+    IDBox.Text = ""
+    IDBox.TextColor3 = Theme.Text
+    IDBox.Font = Enum.Font.Gotham
+    IDBox.TextSize = 12
+    IDBox.Parent = page
+    Instance.new("UICorner", IDBox).CornerRadius = UDim.new(0,6)
 
     local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1,0,0,18) lbl.Position = UDim2.new(0,0,0,34)
-    lbl.BackgroundTransparency = 1 lbl.Text = "Select Vehicle:" lbl.TextColor3 = Color3.fromRGB(200,200,220)
-    lbl.Font = Enum.Font.Gotham lbl.TextSize = 10 lbl.Parent = page
+    lbl.Size = UDim2.new(1,0,0,18)
+    lbl.Position = UDim2.new(0,0,0,36)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = "Select Vehicle:"
+    lbl.TextColor3 = Theme.TextDark
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 11
+    lbl.Parent = page
 
     local skate = Instance.new("TextButton")
-    skate.Size = UDim2.new(0.48,0,0,22) skate.Position = UDim2.new(0,0,0,54)
-    skate.BackgroundColor3 = Color3.fromRGB(0,180,80) skate.Text = "Skateboard"
-    skate.TextColor3 = Color3.new(1,1,1) skate.Font = Enum.Font.GothamBold skate.TextSize = 9
-    skate.Parent = page Instance.new("UICorner", skate).CornerRadius = UDim.new(0,4)
+    skate.Size = UDim2.new(0.48,0,0,24)
+    skate.Position = UDim2.new(0,0,0,58)
+    skate.BackgroundColor3 = Color3.fromRGB(0,180,80)
+    skate.Text = "Skateboard"
+    skate.TextColor3 = Color3.new(1,1,1)
+    skate.Font = Enum.Font.GothamBold
+    skate.TextSize = 10
+    skate.Parent = page
+    Instance.new("UICorner", skate).CornerRadius = UDim.new(0,6)
 
     local hover = Instance.new("TextButton")
-    hover.Size = UDim2.new(0.48,0,0,22) hover.Position = UDim2.new(0.52,0,0,54)
-    hover.BackgroundColor3 = Color3.fromRGB(35,35,45) hover.Text = "Hoverboard"
-    hover.TextColor3 = Color3.new(1,1,1) hover.Font = Enum.Font.GothamBold hover.TextSize = 9
-    hover.Parent = page Instance.new("UICorner", hover).CornerRadius = UDim.new(0,4)
+    hover.Size = UDim2.new(0.48,0,0,24)
+    hover.Position = UDim2.new(0.52,0,0,58)
+    hover.BackgroundColor3 = Theme.Button
+    hover.Text = "Hoverboard"
+    hover.TextColor3 = Theme.Text
+    hover.Font = Enum.Font.GothamBold
+    hover.TextSize = 10
+    hover.Parent = page
+    Instance.new("UICorner", hover).CornerRadius = UDim.new(0,6)
 
     skate.MouseButton1Click:Connect(function()
         SelectedVehicle = "SkateBoard"
         skate.BackgroundColor3 = Color3.fromRGB(0,180,80)
-        hover.BackgroundColor3 = Color3.fromRGB(35,35,45)
+        hover.BackgroundColor3 = Theme.Button
     end)
     hover.MouseButton1Click:Connect(function()
         SelectedVehicle = "SegwaySmall"
         hover.BackgroundColor3 = Color3.fromRGB(0,180,80)
-        skate.BackgroundColor3 = Color3.fromRGB(35,35,45)
+        skate.BackgroundColor3 = Theme.Button
     end)
 
     local scroll = Instance.new("ScrollingFrame")
-    scroll.Size = UDim2.new(1,0,1,-85) scroll.Position = UDim2.new(0,0,0,82)
-    scroll.BackgroundTransparency = 1 scroll.ScrollBarThickness = 2 scroll.Parent = page
-    Instance.new("UIListLayout", scroll).Padding = UDim.new(0,4)
+    scroll.Size = UDim2.new(1,0,1,-90)
+    scroll.Position = UDim2.new(0,0,0,88)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 3
+    scroll.Parent = page
+    Instance.new("UIListLayout", scroll).Padding = UDim.new(0,5)
 
     local function makeBtn(text, color, rgb)
         local b = Instance.new("TextButton")
-        b.Size = UDim2.new(1,-5,0,24)
+        b.Size = UDim2.new(1,-4,0,26)
         b.BackgroundColor3 = color
         b.Text = text
         b.TextColor3 = Color3.new(1,1,1)
         b.Font = Enum.Font.GothamBold
-        b.TextSize = 10
+        b.TextSize = 11
         b.Parent = scroll
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0,4)
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0,6)
         clickAnim(b)
         b.MouseButton1Click:Connect(function()
             SmartPlayMusic(IDBox.Text, SelectedVehicle, rgb)
@@ -331,24 +434,23 @@ local function buildVehicleUI(page)
     makeBtn("Play with RGB", Color3.fromRGB(150,50,255), true)
 
     local stop = Instance.new("TextButton")
-    stop.Size = UDim2.new(1,-5,0,24)
-    stop.BackgroundColor3 = Color3.fromRGB(255,60,60)
+    stop.Size = UDim2.new(1,-4,0,26)
+    stop.BackgroundColor3 = Theme.Danger
     stop.Text = "Stop Music"
     stop.TextColor3 = Color3.new(1,1,1)
     stop.Font = Enum.Font.GothamBold
-    stop.TextSize = 10
+    stop.TextSize = 11
     stop.Parent = scroll
-    Instance.new("UICorner", stop).CornerRadius = UDim.new(0,4)
+    Instance.new("UICorner", stop).CornerRadius = UDim.new(0,6)
     clickAnim(stop)
     stop.MouseButton1Click:Connect(StopMusic)
 
-    scroll.CanvasSize = UDim2.new(0,0,0,100)
+    scroll.CanvasSize = UDim2.new(0,0,0,110)
 end
 
 buildVehicleUI(VehiclePage)
 
 -- Hits Tab
-
 local HitsSongs = {
     {"Mommyy", "112429422439068"},
     {"I Got You Baby", "115492336583856"},
@@ -377,43 +479,58 @@ local HitsSongs = {
     {"Shape Of You", "101465201102170"},
 }
 
-    
-
 local function buildMusicTab(page, songList)
     local scroll = Instance.new("ScrollingFrame")
-    scroll.Size = UDim2.new(1,0,1,-10) scroll.Position = UDim2.new(0,0,0,5)
-    scroll.BackgroundTransparency = 1 scroll.ScrollBarThickness = 3 scroll.Parent = page
-    Instance.new("UIListLayout", scroll).Padding = UDim.new(0,4)
+    scroll.Size = UDim2.new(1,0,1,-8)
+    scroll.Position = UDim2.new(0,0,0,4)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 3
+    scroll.Parent = page
+    Instance.new("UIListLayout", scroll).Padding = UDim.new(0,5)
 
     for _, song in ipairs(songList) do
         local entry = Instance.new("Frame")
-        entry.Size = UDim2.new(1,-5,0,28)
-        entry.BackgroundColor3 = Color3.fromRGB(30,30,40)
+        entry.Size = UDim2.new(1,-4,0,30)
+        entry.BackgroundColor3 = Theme.Button
         entry.Parent = scroll
-        Instance.new("UICorner", entry).CornerRadius = UDim.new(0,4)
+        Instance.new("UICorner", entry).CornerRadius = UDim.new(0,6)
 
         local namelbl = Instance.new("TextLabel")
-        namelbl.Size = UDim2.new(0.6,0,1,0) namelbl.Position = UDim2.new(0,8,0,0)
-        namelbl.BackgroundTransparency = 1 namelbl.Text = song[1]
-        namelbl.TextColor3 = Color3.fromRGB(200,200,220) namelbl.Font = Enum.Font.Gotham
-        namelbl.TextSize = 10 namelbl.TextXAlignment = Enum.TextXAlignment.Left
+        namelbl.Size = UDim2.new(0.58,0,1,0)
+        namelbl.Position = UDim2.new(0,8,0,0)
+        namelbl.BackgroundTransparency = 1
+        namelbl.Text = song[1]
+        namelbl.TextColor3 = Theme.Text
+        namelbl.Font = Enum.Font.Gotham
+        namelbl.TextSize = 11
+        namelbl.TextXAlignment = Enum.TextXAlignment.Left
         namelbl.Parent = entry
 
         local play = Instance.new("TextButton")
-        play.Size = UDim2.new(0,22,0,18) play.Position = UDim2.new(1,-52,0.5,-9)
-        play.BackgroundColor3 = Color3.fromRGB(0,150,50) play.Text = "▶"
-        play.TextColor3 = Color3.new(1,1,1) play.Font = Enum.Font.GothamBold play.TextSize = 10
-        play.Parent = entry Instance.new("UICorner", play).CornerRadius = UDim.new(0,4)
+        play.Size = UDim2.new(0,24,0,20)
+        play.Position = UDim2.new(1,-56,0.5,-10)
+        play.BackgroundColor3 = Color3.fromRGB(0,150,50)
+        play.Text = "▶"
+        play.TextColor3 = Color3.new(1,1,1)
+        play.Font = Enum.Font.GothamBold
+        play.TextSize = 11
+        play.Parent = entry
+        Instance.new("UICorner", play).CornerRadius = UDim.new(0,5)
         clickAnim(play)
         play.MouseButton1Click:Connect(function()
             SmartPlayMusic(tostring(song[2]), SelectedVehicle, false)
         end)
 
         local save = Instance.new("TextButton")
-        save.Size = UDim2.new(0,22,0,18) save.Position = UDim2.new(1,-28,0.5,-9)
-        save.BackgroundColor3 = Color3.fromRGB(255,165,0) save.Text = "💾"
-        save.TextColor3 = Color3.new(1,1,1) save.Font = Enum.Font.GothamBold save.TextSize = 10
-        save.Parent = entry Instance.new("UICorner", save).CornerRadius = UDim.new(0,4)
+        save.Size = UDim2.new(0,24,0,20)
+        save.Position = UDim2.new(1,-28,0.5,-10)
+        save.BackgroundColor3 = Color3.fromRGB(255,165,0)
+        save.Text = "💾"
+        save.TextColor3 = Color3.new(1,1,1)
+        save.Font = Enum.Font.GothamBold
+        save.TextSize = 11
+        save.Parent = entry
+        Instance.new("UICorner", save).CornerRadius = UDim.new(0,5)
         clickAnim(save)
         save.MouseButton1Click:Connect(function()
             if #SavedPlaylist < MaxSavedSongs then
@@ -423,74 +540,91 @@ local function buildMusicTab(page, songList)
             end
         end)
     end
-    scroll.CanvasSize = UDim2.new(0,0,0, #songList * 32)
+    scroll.CanvasSize = UDim2.new(0,0,0, #songList * 35)
 end
 
 buildMusicTab(HitsPage, HitsSongs)
 
--- Saved Tab mit Mülleimer
+-- Saved Tab
 function buildSavedUI(page)
     for _, c in pairs(page:GetChildren()) do
-        if c:IsA("Frame") or c:IsA("ScrollingFrame") then c:Destroy() end
+        if c:IsA("Frame") or c:IsA("ScrollingFrame") or c:IsA("TextLabel") then c:Destroy() end
     end
 
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1,0,0,20) title.Position = UDim2.new(0,0,0,5)
+    title.Size = UDim2.new(1,0,0,22)
+    title.Position = UDim2.new(0,0,0,4)
     title.BackgroundTransparency = 1
     title.Text = "📁 Saved Songs (" .. #SavedPlaylist .. "/" .. MaxSavedSongs .. ")"
-    title.TextColor3 = Color3.fromRGB(0,255,120)
+    title.TextColor3 = Theme.Accent
     title.Font = Enum.Font.GothamBold
-    title.TextSize = 11
+    title.TextSize = 12
     title.Parent = page
 
     local scroll = Instance.new("ScrollingFrame")
-    scroll.Size = UDim2.new(1,0,1,-30) scroll.Position = UDim2.new(0,0,0,30)
-    scroll.BackgroundTransparency = 1 scroll.ScrollBarThickness = 3 scroll.Parent = page
-    Instance.new("UIListLayout", scroll).Padding = UDim.new(0,4)
+    scroll.Size = UDim2.new(1,0,1,-30)
+    scroll.Position = UDim2.new(0,0,0,28)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 3
+    scroll.Parent = page
+    Instance.new("UIListLayout", scroll).Padding = UDim.new(0,5)
 
     if #SavedPlaylist == 0 then
         local empty = Instance.new("TextLabel")
-        empty.Size = UDim2.new(1,0,0,40) empty.BackgroundTransparency = 1
+        empty.Size = UDim2.new(1,0,0,45)
+        empty.BackgroundTransparency = 1
         empty.Text = "No saved songs yet!\nClick 💾 in HITS"
-        empty.TextColor3 = Color3.fromRGB(150,150,150) empty.Font = Enum.Font.Gotham
-        empty.TextSize = 10 empty.TextWrapped = true empty.Parent = scroll
+        empty.TextColor3 = Theme.TextDark
+        empty.Font = Enum.Font.Gotham
+        empty.TextSize = 11
+        empty.TextWrapped = true
+        empty.Parent = scroll
         return
     end
 
     for i, song in ipairs(SavedPlaylist) do
         local entry = Instance.new("Frame")
-        entry.Size = UDim2.new(1,-5,0,28)
-        entry.BackgroundColor3 = Color3.fromRGB(30,30,40)
+        entry.Size = UDim2.new(1,-4,0,30)
+        entry.BackgroundColor3 = Theme.Button
         entry.Parent = scroll
-        Instance.new("UICorner", entry).CornerRadius = UDim.new(0,4)
+        Instance.new("UICorner", entry).CornerRadius = UDim.new(0,6)
 
         local namelbl = Instance.new("TextLabel")
-        namelbl.Size = UDim2.new(0.5,0,1,0) namelbl.Position = UDim2.new(0,5,0,0)
-        namelbl.BackgroundTransparency = 1 namelbl.Text = song.name
-        namelbl.TextColor3 = Color3.fromRGB(200,200,220) namelbl.Font = Enum.Font.Gotham
-        namelbl.TextSize = 9 namelbl.TextXAlignment = Enum.TextXAlignment.Left
+        namelbl.Size = UDim2.new(0.5,0,1,0)
+        namelbl.Position = UDim2.new(0,6,0,0)
+        namelbl.BackgroundTransparency = 1
+        namelbl.Text = song.name
+        namelbl.TextColor3 = Theme.Text
+        namelbl.Font = Enum.Font.Gotham
+        namelbl.TextSize = 11
+        namelbl.TextXAlignment = Enum.TextXAlignment.Left
         namelbl.Parent = entry
 
         local play = Instance.new("TextButton")
-        play.Size = UDim2.new(0,22,0,18) play.Position = UDim2.new(1,-52,0.5,-9)
-        play.BackgroundColor3 = Color3.fromRGB(0,150,50) play.Text = "▶"
-        play.TextColor3 = Color3.new(1,1,1) play.Font = Enum.Font.GothamBold play.TextSize = 10
-        play.Parent = entry Instance.new("UICorner", play).CornerRadius = UDim.new(0,4)
+        play.Size = UDim2.new(0,24,0,20)
+        play.Position = UDim2.new(1,-56,0.5,-10)
+        play.BackgroundColor3 = Color3.fromRGB(0,150,50)
+        play.Text = "▶"
+        play.TextColor3 = Color3.new(1,1,1)
+        play.Font = Enum.Font.GothamBold
+        play.TextSize = 11
+        play.Parent = entry
+        Instance.new("UICorner", play).CornerRadius = UDim.new(0,5)
         clickAnim(play)
         play.MouseButton1Click:Connect(function()
             SmartPlayMusic(song.id, SelectedVehicle, false)
         end)
 
-        -- Roter Mülleimer
         local deleteBtn = Instance.new("TextButton")
-        deleteBtn.Size = UDim2.new(0,22,0,18) deleteBtn.Position = UDim2.new(1,-28,0.5,-9)
-        deleteBtn.BackgroundColor3 = Color3.fromRGB(255,60,60)
+        deleteBtn.Size = UDim2.new(0,24,0,20)
+        deleteBtn.Position = UDim2.new(1,-28,0.5,-10)
+        deleteBtn.BackgroundColor3 = Theme.Danger
         deleteBtn.Text = "✕"
         deleteBtn.TextColor3 = Color3.new(1,1,1)
         deleteBtn.Font = Enum.Font.GothamBold
         deleteBtn.TextSize = 12
         deleteBtn.Parent = entry
-        Instance.new("UICorner", deleteBtn).CornerRadius = UDim.new(0,4)
+        Instance.new("UICorner", deleteBtn).CornerRadius = UDim.new(0,5)
         clickAnim(deleteBtn)
 
         deleteBtn.MouseButton1Click:Connect(function()
@@ -499,41 +633,60 @@ function buildSavedUI(page)
             buildSavedUI(page)
         end)
     end
-    scroll.CanvasSize = UDim2.new(0,0,0,#SavedPlaylist*32)
+    scroll.CanvasSize = UDim2.new(0,0,0,#SavedPlaylist*35)
 end
 
 buildSavedUI(SavedPage)
 
--- Update Tab
+-- Update Tab (hier ist der Theme-Switch)
 local function buildUpdateUI(page)
+    for _, c in pairs(page:GetChildren()) do
+        c:Destroy()
+    end
+
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1,0,0,30) title.Position = UDim2.new(0,10,0,10)
+    title.Size = UDim2.new(1,0,0,28)
+    title.Position = UDim2.new(0,6,0,6)
     title.BackgroundTransparency = 1
     title.Text = "V6 Update Log"
-    title.TextColor3 = Color3.fromRGB(0,255,120)
+    title.TextColor3 = Theme.Accent
     title.Font = Enum.Font.GothamBlack
-    title.TextSize = 16
+    title.TextSize = 15
     title.Parent = page
 
     local text = Instance.new("TextLabel")
-    text.Size = UDim2.new(1,-20,1,-50)
-    text.Position = UDim2.new(0,10,0,50)
+    text.Size = UDim2.new(1,-12,0,90)
+    text.Position = UDim2.new(0,6,0,40)
     text.BackgroundTransparency = 1
-    text.Text = 
-[[• Updated to Version 6
-• Added 5 new songs to HITS:
-  - New 1
-  - New 2
-  - New 3
-  - New 4
-  - New 5]]
-    text.TextColor3 = Color3.fromRGB(200,200,220)
+    text.Text = "• Updated to Version 6\n• Added 5 new songs to HITS\n• Dark / Light Mode\n• Bessere Optik"
+    text.TextColor3 = Theme.Text
     text.Font = Enum.Font.Gotham
-    text.TextSize = 11
+    text.TextSize = 12
     text.TextXAlignment = Enum.TextXAlignment.Left
     text.TextYAlignment = Enum.TextYAlignment.Top
     text.TextWrapped = true
     text.Parent = page
+
+    -- Theme Switch Button
+    local themeBtn = Instance.new("TextButton")
+    themeBtn.Size = UDim2.new(1,-12,0,34)
+    themeBtn.Position = UDim2.new(0,6,0,145)
+    themeBtn.BackgroundColor3 = Theme.Button
+    themeBtn.Text = CurrentTheme == "Dark" and "🌙  Dark Mode  →  Light" or "☀️  Light Mode  →  Dark"
+    themeBtn.TextColor3 = Theme.Text
+    themeBtn.Font = Enum.Font.GothamBold
+    themeBtn.TextSize = 13
+    themeBtn.Parent = page
+    Instance.new("UICorner", themeBtn).CornerRadius = UDim.new(0,8)
+    clickAnim(themeBtn)
+
+    themeBtn.MouseButton1Click:Connect(function()
+        CurrentTheme = CurrentTheme == "Dark" and "Light" or "Dark"
+        ApplyTheme()
+        buildUpdateUI(page)
+        buildSavedUI(SavedPage)
+        -- Hits und Vehicle behalten ihre Farben über Theme
+    end)
 end
 
 buildUpdateUI(UpdatePage)
@@ -541,26 +694,40 @@ buildUpdateUI(UpdatePage)
 -- Credits Tab
 local function buildCreditsUI(page)
     local t = Instance.new("TextLabel")
-    t.Size = UDim2.new(1,0,0,30) t.Position = UDim2.new(0,10,0,10)
-    t.BackgroundTransparency = 1 t.Text = "Credits"
-    t.TextColor3 = Color3.fromRGB(0,255,120) t.Font = Enum.Font.GothamBlack t.TextSize = 16
+    t.Size = UDim2.new(1,0,0,30)
+    t.Position = UDim2.new(0,8,0,8)
+    t.BackgroundTransparency = 1
+    t.Text = "Credits"
+    t.TextColor3 = Theme.Accent
+    t.Font = Enum.Font.GothamBlack
+    t.TextSize = 16
     t.Parent = page
 
     local l1 = Instance.new("TextLabel")
-    l1.Size = UDim2.new(1,-20,0,22) l1.Position = UDim2.new(0,10,0,50)
+    l1.Size = UDim2.new(1,-16,0,22)
+    l1.Position = UDim2.new(0,8,0,48)
     l1.BackgroundTransparency = 1
     l1.Text = "SamBlox (Iostein_cool) Hub manufacturer/script"
-    l1.TextColor3 = Color3.fromRGB(200,200,220) l1.Font = Enum.Font.Gotham l1.TextSize = 11
-    l1.TextXAlignment = Enum.TextXAlignment.Left l1.TextWrapped = true l1.Parent = page
+    l1.TextColor3 = Theme.Text
+    l1.Font = Enum.Font.Gotham
+    l1.TextSize = 12
+    l1.TextXAlignment = Enum.TextXAlignment.Left
+    l1.TextWrapped = true
+    l1.Parent = page
 
     local l2 = Instance.new("TextLabel")
-    l2.Size = UDim2.new(1,-20,0,22) l2.Position = UDim2.new(0,10,0,74)
+    l2.Size = UDim2.new(1,-16,0,22)
+    l2.Position = UDim2.new(0,8,0,74)
     l2.BackgroundTransparency = 1
     l2.Text = "Rosti (Rostam7486) SamBlox's best friend"
-    l2.TextColor3 = Color3.fromRGB(200,200,220) l2.Font = Enum.Font.Gotham l2.TextSize = 11
-    l2.TextXAlignment = Enum.TextXAlignment.Left l2.TextWrapped = true l2.Parent = page
+    l2.TextColor3 = Theme.Text
+    l2.Font = Enum.Font.Gotham
+    l2.TextSize = 12
+    l2.TextXAlignment = Enum.TextXAlignment.Left
+    l2.TextWrapped = true
+    l2.Parent = page
 end
 
 buildCreditsUI(CreditsPage)
 
-print("✅ Sam's Music V6 loaded - 5 new songs added")
+print("✅ Sam's Music V6 loaded - optisch verbessert + Dark/Light Mode")
