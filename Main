@@ -477,6 +477,9 @@ local HitsSongs = {
     {"Obligatory Hardtekk", "100825248589453"},
     {"German Anthem", "1838111511"},
     {"Shape Of You", "101465201102170"},
+    {"Hard Pulse", "1839246774"},
+    {"Dropsik Bass", "77396545462103"},
+    {"New Hardtekk", "122542000297473"},
 }
 
 local function buildMusicTab(page, songList)
