@@ -481,7 +481,10 @@ local HitsSongs = {
     {"Dropsik Bass", "77396545462103"},
     {"New Hardtekk", "122542000297473"},
     {"Erika", "89197604862010"},
-    {"Kaa", "84026997473821"},
+    {"kaa", "84026997473821"},
+    {"bayern", "132965113038362"}
+    {"hard", "132151809709601"},
+    {"dancin", "123252719028796"},
 }
 
 local function buildMusicTab(page, songList)
