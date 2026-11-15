@@ -1,4 +1,4 @@
--- Sam's Music V6 - Clean Version (nur optisch verbessert + Dark/Light Mode)
+-- Sam's Music V6.1 - Clean Version (Sounds Tab hinzugefügt + Dark/Light Mode)
 
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
@@ -55,11 +55,11 @@ task.spawn(function()
     pcall(function()
         if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
             local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
-            if channel then channel:SendAsync("⚡ Sam's Music V6 Loaded ⚡") end
+            if channel then channel:SendAsync("⚡ Sam's Music V6.1 Loaded ⚡") end
         else
             local sayEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
             if sayEvent and sayEvent:FindFirstChild("SayMessageRequest") then
-                sayEvent.SayMessageRequest:FireServer("⚡ Sam's Music V6 Loaded ⚡", "All")
+                sayEvent.SayMessageRequest:FireServer("⚡ Sam's Music V6.1 Loaded ⚡", "All")
             end
         end
     end)
@@ -151,7 +151,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0.75,0,1,0)
 Title.Position = UDim2.new(0,14,0,0)
 Title.BackgroundTransparency = 1
-Title.Text = "Sam's Music V6 | " .. LocalPlayer.Name
+Title.Text = "Sam's Music V6.1 | " .. LocalPlayer.Name
 Title.TextColor3 = Theme.Text
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 13
@@ -193,7 +193,7 @@ local function clickAnim(btn)
     end)
 end
 
--- Tab System (untereinander)
+-- Tab System
 local TabButtons = Instance.new("Frame")
 TabButtons.Size = UDim2.new(0,108,1,-46)
 TabButtons.Position = UDim2.new(0,8,0,38)
@@ -264,6 +264,7 @@ end
 
 local VehiclePage = createTab("Vehicle", true)
 local HitsPage    = createTab("HITS", false)
+local SoundsPage  = createTab("SOUNDS", false)
 local SavedPage   = createTab("SAVED", false)
 local UpdatePage  = createTab("UPDATE", false)
 local CreditsPage = createTab("CREDITS", false)
@@ -287,7 +288,7 @@ local function ApplyTheme()
     end
 end
 
--- ==================== BACKEND (UNVERÄNDERT) ====================
+-- ==================== BACKEND ====================
 local RE = ReplicatedStorage:FindFirstChild("RE") or ReplicatedStorage:WaitForChild("RE", 5)
 local VehicleRemote = RE and RE:FindFirstChild("1NoMoto1rVehicle1s")
 local ClearRemote = RE and RE:FindFirstChild("1Clea1rTool1s")
@@ -450,7 +451,7 @@ end
 
 buildVehicleUI(VehiclePage)
 
--- Hits Tab
+-- ===================== HITS =====================
 local HitsSongs = {
     {"Mommyy", "112429422439068"},
     {"I Got You Baby", "115492336583856"},
@@ -485,6 +486,24 @@ local HitsSongs = {
     {"bayern", "132965113038362"},
     {"hard", "132151809709601"},
     {"dancin", "123252719028796"},
+}
+
+-- ===================== SOUNDS =====================
+local SoundsSongs = {
+    {"Sound1", "7772283448"},
+    {"Sound2", "6332053702"},
+    {"Sound3", "139056779819258"},
+    {"Sound4", "112599888154205"},
+    {"Sound5", "6700501985"},
+    {"Sound6", "18623229993"},
+    {"Sound7", "8983177095"},
+    {"Sound8", "5303371139"},
+    {"Sound9", "6729922069"},
+    {"Sound10", "5153845714"},
+    {"Sound11", "8388105535"},
+    {"Sound12", "8647630325"},
+    {"Sound13", "7361042352"},
+    {"Sound14", "1626996526"},
 }
 
 local function buildMusicTab(page, songList)
@@ -552,6 +571,7 @@ local function buildMusicTab(page, songList)
 end
 
 buildMusicTab(HitsPage, HitsSongs)
+buildMusicTab(SoundsPage, SoundsSongs)
 
 -- Saved Tab
 function buildSavedUI(page)
@@ -581,7 +601,7 @@ function buildSavedUI(page)
         local empty = Instance.new("TextLabel")
         empty.Size = UDim2.new(1,0,0,45)
         empty.BackgroundTransparency = 1
-        empty.Text = "No saved songs yet!\nClick 💾 in HITS"
+        empty.Text = "No saved songs yet!\nClick 💾 in HITS or SOUNDS"
         empty.TextColor3 = Theme.TextDark
         empty.Font = Enum.Font.Gotham
         empty.TextSize = 11
@@ -646,7 +666,7 @@ end
 
 buildSavedUI(SavedPage)
 
--- Update Tab (hier ist der Theme-Switch)
+-- Update Tab
 local function buildUpdateUI(page)
     for _, c in pairs(page:GetChildren()) do
         c:Destroy()
@@ -656,17 +676,17 @@ local function buildUpdateUI(page)
     title.Size = UDim2.new(1,0,0,28)
     title.Position = UDim2.new(0,6,0,6)
     title.BackgroundTransparency = 1
-    title.Text = "V6 Update Log"
+    title.Text = "V6.1 Update Log"
     title.TextColor3 = Theme.Accent
     title.Font = Enum.Font.GothamBlack
     title.TextSize = 15
     title.Parent = page
 
     local text = Instance.new("TextLabel")
-    text.Size = UDim2.new(1,-12,0,90)
+    text.Size = UDim2.new(1,-12,0,100)
     text.Position = UDim2.new(0,6,0,40)
     text.BackgroundTransparency = 1
-    text.Text = "• Updated to Version 6\n• Added 5 new songs to HITS\n• Dark / Light Mode\n• Bessere Optik"
+    text.Text = "• Updated to Version 6.1\n• Added SOUNDS Tab\n• Sounds can be saved like songs\n• Dark / Light Mode\n• Bessere Optik"
     text.TextColor3 = Theme.Text
     text.Font = Enum.Font.Gotham
     text.TextSize = 12
@@ -675,10 +695,9 @@ local function buildUpdateUI(page)
     text.TextWrapped = true
     text.Parent = page
 
-    -- Theme Switch Button
     local themeBtn = Instance.new("TextButton")
     themeBtn.Size = UDim2.new(1,-12,0,34)
-    themeBtn.Position = UDim2.new(0,6,0,145)
+    themeBtn.Position = UDim2.new(0,6,0,155)
     themeBtn.BackgroundColor3 = Theme.Button
     themeBtn.Text = CurrentTheme == "Dark" and "🌙  Dark Mode  →  Light" or "☀️  Light Mode  →  Dark"
     themeBtn.TextColor3 = Theme.Text
@@ -693,7 +712,6 @@ local function buildUpdateUI(page)
         ApplyTheme()
         buildUpdateUI(page)
         buildSavedUI(SavedPage)
-        -- Hits und Vehicle behalten ihre Farben über Theme
     end)
 end
 
@@ -738,4 +756,4 @@ end
 
 buildCreditsUI(CreditsPage)
 
-print("✅ Sam's Music V6 loaded - optisch verbessert + Dark/Light Mode")
+print("✅ Sam's Music V6.1 loaded - SOUNDS Tab hinzugefügt")
