@@ -1,0 +1,1150 @@
+-- Sam's Music V6.2 - Christmas Update (Pure Optical Redesign)
+-- Alle Funktionen, Layout, Buttons, Positionen und Größen bleiben 100% identisch zu V6.1
+
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local TextChatService = game:GetService("TextChatService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+
+if CoreGui:FindFirstChild("SamMusicV6") then
+    CoreGui:FindFirstChild("SamMusicV6"):Destroy()
+end
+
+-- ===================== CHRISTMAS THEME =====================
+local Themes = {
+    Dark = {
+        Bg          = Color3.fromRGB(10, 12, 20),
+        Secondary   = Color3.fromRGB(16, 20, 30),
+        Content     = Color3.fromRGB(14, 18, 26),
+        Button      = Color3.fromRGB(26, 32, 46),
+        ButtonHover = Color3.fromRGB(38, 48, 66),
+        Accent      = Color3.fromRGB(0, 220, 120),
+        Text        = Color3.fromRGB(245, 248, 255),
+        TextDark    = Color3.fromRGB(140, 155, 180),
+        Danger      = Color3.fromRGB(230, 50, 60),
+        Stroke      = Color3.fromRGB(0, 220, 120),
+        Purple      = Color3.fromRGB(140, 50, 255),
+        RedBtn      = Color3.fromRGB(200, 40, 50),
+        Gold        = Color3.fromRGB(255, 200, 60),
+    },
+    Light = {
+        Bg          = Color3.fromRGB(245, 245, 248),
+        Secondary   = Color3.fromRGB(230, 230, 236),
+        Content     = Color3.fromRGB(255, 255, 255),
+        Button      = Color3.fromRGB(220, 220, 228),
+        ButtonHover = Color3.fromRGB(205, 205, 215),
+        Accent      = Color3.fromRGB(0, 170, 90),
+        Text        = Color3.fromRGB(25, 25, 30),
+        TextDark    = Color3.fromRGB(90, 90, 105),
+        Danger      = Color3.fromRGB(220, 50, 50),
+        Stroke      = Color3.fromRGB(0, 170, 90),
+        Purple      = Color3.fromRGB(140, 50, 255),
+        RedBtn      = Color3.fromRGB(200, 40, 50),
+        Gold        = Color3.fromRGB(200, 150, 30),
+    }
+}
+
+local CurrentTheme = "Dark"
+local Theme = Themes.Dark
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SamMusicV6"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.Parent = CoreGui
+
+-- ===================== FULLSCREEN SNOW =====================
+local FullSnowFrame = Instance.new("Frame")
+FullSnowFrame.Name = "FullScreenSnow"
+FullSnowFrame.Size = UDim2.new(1, 0, 1, 0)
+FullSnowFrame.Position = UDim2.new(0, 0, 0, 0)
+FullSnowFrame.BackgroundTransparency = 1
+FullSnowFrame.ZIndex = 1
+FullSnowFrame.Parent = ScreenGui
+
+local snowActive = true
+local snowflakes = {}
+
+local function createSnowflake()
+    if not snowActive or not FullSnowFrame.Parent then return end
+    local flake = Instance.new("TextLabel")
+    local size = math.random(10, 22)
+    flake.Size = UDim2.new(0, size, 0, size)
+    flake.Position = UDim2.new(math.random(), 0, -0.05, 0)
+    flake.BackgroundTransparency = 1
+    flake.Text = ({"❄", "❅", "❆", "✦", "✧"})[math.random(1, 5)]
+    flake.TextColor3 = Color3.fromRGB(200 + math.random(0, 40), 230 + math.random(0, 20), 255)
+    flake.TextTransparency = math.random(15, 50) / 100
+    flake.TextSize = size - 2
+    flake.Font = Enum.Font.GothamBold
+    flake.ZIndex = 1
+    flake.Parent = FullSnowFrame
+    table.insert(snowflakes, flake)
+
+    local duration = math.random(7, 14)
+    local sideMove = (math.random() - 0.5) * 0.25
+    TweenService:Create(flake, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+        Position = UDim2.new(flake.Position.X.Scale + sideMove, 0, 1.1, 0),
+        TextTransparency = 1,
+        Rotation = math.random(-40, 40)
+    }):Play()
+
+    task.delay(duration + 0.5, function()
+        if flake and flake.Parent then flake:Destroy() end
+    end)
+end
+
+task.spawn(function()
+    while ScreenGui.Parent do
+        if snowActive and Main and Main.Visible then
+            createSnowflake()
+            if math.random() > 0.6 then createSnowflake() end
+        end
+        task.wait(0.18)
+    end
+end)
+
+-- ===================== FLYING SANTA SLEIGH =====================
+local function spawnSantaSleigh()
+    if not snowActive or not Main or not Main.Visible then return end
+
+    local sleigh = Instance.new("TextLabel")
+    sleigh.Size = UDim2.new(0, 180, 0, 50)
+    sleigh.Position = UDim2.new(-0.25, 0, 0.02, 0)
+    sleigh.BackgroundTransparency = 1
+    sleigh.Text = "🦌🦌🦌🛷🎅"
+    sleigh.TextSize = 28
+    sleigh.Font = Enum.Font.GothamBold
+    sleigh.TextColor3 = Color3.new(1, 1, 1)
+    sleigh.ZIndex = 10
+    sleigh.Parent = ScreenGui
+
+    local glow = Instance.new("TextLabel")
+    glow.Size = UDim2.new(1, 20, 1, 10)
+    glow.Position = UDim2.new(0, -10, 0, -5)
+    glow.BackgroundTransparency = 1
+    glow.Text = "✨          ✨"
+    glow.TextSize = 16
+    glow.TextColor3 = Color3.fromRGB(255, 220, 100)
+    glow.ZIndex = 9
+    glow.Parent = sleigh
+
+    TweenService:Create(sleigh, TweenInfo.new(9, Enum.EasingStyle.Linear), {
+        Position = UDim2.new(1.25, 0, 0.06, 0)
+    }):Play()
+
+    task.delay(9.5, function()
+        if sleigh and sleigh.Parent then sleigh:Destroy() end
+    end)
+end
+
+task.spawn(function()
+    task.wait(4)
+    while ScreenGui.Parent do
+        if snowActive and Main and Main.Visible then
+            spawnSantaSleigh()
+        end
+        task.wait(math.random(18, 32))
+    end
+end)
+
+-- Auto Chat
+task.spawn(function()
+    task.wait(0.8)
+    pcall(function()
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+            local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+            if channel then channel:SendAsync("🎅 Sam's Music V6.2 Christmas Version Loaded 🎄") end
+        else
+            local sayEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+            if sayEvent and sayEvent:FindFirstChild("SayMessageRequest") then
+                sayEvent.SayMessageRequest:FireServer("🎅 Sam's Music V6.2 Christmas Version Loaded 🎄", "All")
+            end
+        end
+    end)
+end)
+
+-- Main Frame
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 430, 0, 340)
+Main.Position = UDim2.new(0.5, -215, 0.5, -170)
+Main.BackgroundColor3 = Theme.Bg
+Main.Parent = ScreenGui
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 16)
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Theme.Stroke
+Stroke.Thickness = 2.5
+Stroke.Transparency = 0.2
+Stroke.Parent = Main
+
+-- Soft outer glow
+local OuterGlow = Instance.new("UIStroke")
+OuterGlow.Color = Color3.fromRGB(0, 255, 140)
+OuterGlow.Thickness = 7
+OuterGlow.Transparency = 0.82
+OuterGlow.Parent = Main
+
+-- Particle / Snow inside GUI
+local ParticleFrame = Instance.new("Frame")
+ParticleFrame.Size = UDim2.new(1,0,1,0)
+ParticleFrame.BackgroundTransparency = 1
+ParticleFrame.ClipsDescendants = true
+ParticleFrame.ZIndex = 0
+ParticleFrame.Parent = Main
+Instance.new("UICorner", ParticleFrame).CornerRadius = UDim.new(0,16)
+
+task.spawn(function()
+    while task.wait(0.4) do
+        if not ParticleFrame.Parent then break end
+        if not Main.Visible then continue end
+        local p = Instance.new("TextLabel")
+        p.Size = UDim2.new(0, math.random(9,15), 0, math.random(9,15))
+        p.Position = UDim2.new(math.random(), 0, -0.04, 0)
+        p.BackgroundTransparency = 1
+        p.Text = "❄"
+        p.TextColor3 = Color3.fromRGB(200, 230, 255)
+        p.TextTransparency = math.random(25,55)/100
+        p.TextSize = math.random(9,14)
+        p.Font = Enum.Font.GothamBold
+        p.ZIndex = 0
+        p.Parent = ParticleFrame
+        TweenService:Create(p, TweenInfo.new(math.random(5,8), Enum.EasingStyle.Linear), {
+            Position = UDim2.new(p.Position.X.Scale + (math.random(-8,8)/100), 0, 1.08, 0),
+            TextTransparency = 1
+        }):Play()
+        task.delay(9, function() if p then p:Destroy() end end)
+    end
+end)
+
+-- Top snow edge
+local TopSnow = Instance.new("Frame")
+TopSnow.Size = UDim2.new(1, 0, 0, 16)
+TopSnow.Position = UDim2.new(0, 0, 0, 0)
+TopSnow.BackgroundColor3 = Color3.fromRGB(235, 245, 255)
+TopSnow.BackgroundTransparency = 0.12
+TopSnow.BorderSizePixel = 0
+TopSnow.ZIndex = 2
+TopSnow.Parent = Main
+Instance.new("UICorner", TopSnow).CornerRadius = UDim.new(0, 16)
+
+local TopSnow2 = Instance.new("Frame")
+TopSnow2.Size = UDim2.new(1, 0, 0, 9)
+TopSnow2.Position = UDim2.new(0, 0, 0, 9)
+TopSnow2.BackgroundColor3 = Theme.Bg
+TopSnow2.BorderSizePixel = 0
+TopSnow2.ZIndex = 2
+TopSnow2.Parent = Main
+
+-- Garland lights on top
+local Garland = Instance.new("TextLabel")
+Garland.Size = UDim2.new(1, -20, 0, 18)
+Garland.Position = UDim2.new(0, 10, 0, 2)
+Garland.BackgroundTransparency = 1
+Garland.Text = "🔴 🟢 🟡 🔴 🟢 🟡 🔴 🟢 🟡 🔴 🟢 🟡 🔴 🟢 🟡"
+Garland.TextSize = 11
+Garland.TextColor3 = Color3.fromRGB(255, 255, 255)
+Garland.Font = Enum.Font.GothamBold
+Garland.ZIndex = 6
+Garland.Parent = Main
+
+-- Minimize Button (yellow)
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 26, 0, 22)
+MinimizeBtn.Position = UDim2.new(1, -62, 0, 8)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 175, 30)
+MinimizeBtn.Text = "−"
+MinimizeBtn.TextColor3 = Color3.new(1,1,1)
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 16
+MinimizeBtn.ZIndex = 8
+MinimizeBtn.Parent = Main
+Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 6)
+
+-- Close Button (red)
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 26, 0, 22)
+CloseBtn.Position = UDim2.new(1, -32, 0, 8)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(230, 55, 55)
+CloseBtn.Text = "×"
+CloseBtn.TextColor3 = Color3.new(1,1,1)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 16
+CloseBtn.ZIndex = 8
+CloseBtn.Parent = Main
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+
+local MinIcon = Instance.new("TextButton")
+MinIcon.Size = UDim2.new(0, 52, 0, 52)
+MinIcon.Position = UDim2.new(1, -62, 0, 20)
+MinIcon.BackgroundColor3 = Theme.Accent
+MinIcon.Text = "🎅"
+MinIcon.TextColor3 = Color3.new(1,1,1)
+MinIcon.Font = Enum.Font.GothamBold
+MinIcon.TextSize = 24
+MinIcon.Visible = false
+MinIcon.Parent = ScreenGui
+Instance.new("UICorner", MinIcon).CornerRadius = UDim.new(1,0)
+
+local function setSnowActive(state)
+    snowActive = state
+    if not state then
+        for _, f in ipairs(snowflakes) do
+            if f and f.Parent then f:Destroy() end
+        end
+        snowflakes = {}
+        FullSnowFrame:ClearAllChildren()
+    end
+end
+
+MinimizeBtn.MouseButton1Click:Connect(function()
+    Main.Visible = false
+    MinIcon.Visible = true
+    setSnowActive(false)
+end)
+CloseBtn.MouseButton1Click:Connect(function()
+    Main.Visible = false
+    MinIcon.Visible = true
+    setSnowActive(false)
+end)
+MinIcon.MouseButton1Click:Connect(function()
+    Main.Visible = true
+    MinIcon.Visible = false
+    setSnowActive(true)
+end)
+
+-- Header
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 52)
+Header.Position = UDim2.new(0, 0, 0, 14)
+Header.BackgroundTransparency = 1
+Header.ZIndex = 3
+Header.Parent = Main
+
+-- Santa head (cool with sunglasses)
+local SantaHat = Instance.new("TextLabel")
+SantaHat.Size = UDim2.new(0, 42, 0, 42)
+SantaHat.Position = UDim2.new(0, 8, 0, 0)
+SantaHat.BackgroundTransparency = 1
+SantaHat.Text = "🎅"
+SantaHat.TextSize = 32
+SantaHat.Font = Enum.Font.GothamBold
+SantaHat.ZIndex = 5
+SantaHat.Parent = Header
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0.65, 0, 0, 26)
+Title.Position = UDim2.new(0, 52, 0, 2)
+Title.BackgroundTransparency = 1
+Title.Text = "Sam's Music"
+Title.TextColor3 = Color3.fromRGB(255, 240, 180)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 21
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.ZIndex = 5
+Title.Parent = Header
+
+-- Gold underline effect
+local TitleGlow = Instance.new("TextLabel")
+TitleGlow.Size = UDim2.new(0.55, 0, 0, 8)
+TitleGlow.Position = UDim2.new(0, 52, 0, 24)
+TitleGlow.BackgroundTransparency = 1
+TitleGlow.Text = "━━━━━━━"
+TitleGlow.TextColor3 = Color3.fromRGB(255, 190, 50)
+TitleGlow.TextSize = 10
+TitleGlow.Font = Enum.Font.GothamBold
+TitleGlow.ZIndex = 4
+TitleGlow.Parent = Header
+
+local VersionLabel = Instance.new("TextLabel")
+VersionLabel.Size = UDim2.new(0.25, 0, 0, 22)
+VersionLabel.Position = UDim2.new(0.68, 0, 0, 3)
+VersionLabel.BackgroundTransparency = 1
+VersionLabel.Text = "V6.2"
+VersionLabel.TextColor3 = Color3.fromRGB(0, 255, 140)
+VersionLabel.Font = Enum.Font.GothamBlack
+VersionLabel.TextSize = 18
+VersionLabel.TextXAlignment = Enum.TextXAlignment.Left
+VersionLabel.ZIndex = 5
+VersionLabel.Parent = Header
+
+-- Christmas Version Badge
+local Badge = Instance.new("Frame")
+Badge.Size = UDim2.new(0, 138, 0, 18)
+Badge.Position = UDim2.new(0, 52, 0, 30)
+Badge.BackgroundColor3 = Color3.fromRGB(190, 35, 45)
+Badge.ZIndex = 5
+Badge.Parent = Header
+Instance.new("UICorner", Badge).CornerRadius = UDim.new(1, 0)
+
+local BadgeStroke = Instance.new("UIStroke")
+BadgeStroke.Color = Color3.fromRGB(255, 100, 100)
+BadgeStroke.Thickness = 1
+BadgeStroke.Transparency = 0.3
+BadgeStroke.Parent = Badge
+
+local BadgeText = Instance.new("TextLabel")
+BadgeText.Size = UDim2.new(1, 0, 1, 0)
+BadgeText.BackgroundTransparency = 1
+BadgeText.Text = "❄ Christmas Version ❄"
+BadgeText.TextColor3 = Color3.new(1,1,1)
+BadgeText.Font = Enum.Font.GothamBold
+BadgeText.TextSize = 11
+BadgeText.ZIndex = 6
+BadgeText.Parent = Badge
+
+local ByLabel = Instance.new("TextLabel")
+ByLabel.Size = UDim2.new(0.35, 0, 0, 14)
+ByLabel.Position = UDim2.new(0.58, 0, 0, 32)
+ByLabel.BackgroundTransparency = 1
+ByLabel.Text = "👑 by SamBlox"
+ByLabel.TextColor3 = Color3.fromRGB(255, 215, 80)
+ByLabel.Font = Enum.Font.Gotham
+ByLabel.TextSize = 11
+ByLabel.TextXAlignment = Enum.TextXAlignment.Left
+ByLabel.ZIndex = 5
+ByLabel.Parent = Header
+
+-- Drag
+local dragging, dragInput, dragStart, startPos
+Header.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+    end
+end)
+Header.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+local function clickAnim(btn)
+    local orig = btn.Size
+    btn.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(orig.X.Scale, orig.X.Offset-2, orig.Y.Scale, orig.Y.Offset-2)}):Play()
+        end
+    end)
+    btn.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            TweenService:Create(btn, TweenInfo.new(0.1), {Size = orig}):Play()
+        end
+    end)
+end
+
+-- Tab System
+local TabButtons = Instance.new("Frame")
+TabButtons.Size = UDim2.new(0, 112, 1, -70)
+TabButtons.Position = UDim2.new(0, 10, 0, 70)
+TabButtons.BackgroundTransparency = 1
+TabButtons.ZIndex = 3
+TabButtons.Parent = Main
+
+local TabLayout = Instance.new("UIListLayout")
+TabLayout.Padding = UDim.new(0, 8)
+TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+TabLayout.Parent = TabButtons
+
+local ContentArea = Instance.new("Frame")
+ContentArea.Size = UDim2.new(1, -136, 1, -90)
+ContentArea.Position = UDim2.new(0, 128, 0, 70)
+ContentArea.BackgroundColor3 = Theme.Content
+ContentArea.ZIndex = 2
+ContentArea.Parent = Main
+Instance.new("UICorner", ContentArea).CornerRadius = UDim.new(0, 12)
+
+local ContentStroke = Instance.new("UIStroke")
+ContentStroke.Color = Color3.fromRGB(0, 180, 100)
+ContentStroke.Thickness = 1.2
+ContentStroke.Transparency = 0.55
+ContentStroke.Parent = ContentArea
+
+local activePage = nil
+local TabBtnRefs = {}
+
+local function createTab(name, icon, isFirst)
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(1, 0, 0, 32)
+    Btn.BackgroundColor3 = isFirst and Color3.fromRGB(0, 180, 90) or Theme.Button
+    Btn.BackgroundTransparency = isFirst and 0 or 0.12
+    Btn.Text = icon .. "  " .. name
+    Btn.TextColor3 = isFirst and Color3.new(1,1,1) or Theme.TextDark
+    Btn.Font = Enum.Font.GothamBold
+    Btn.TextSize = 12
+    Btn.ZIndex = 4
+    Btn.Parent = TabButtons
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
+
+    -- Snow accent on tab
+    local snow = Instance.new("TextLabel")
+    snow.Size = UDim2.new(0, 14, 0, 14)
+    snow.Position = UDim2.new(1, -18, 0.5, -7)
+    snow.BackgroundTransparency = 1
+    snow.Text = "❄"
+    snow.TextSize = 11
+    snow.TextColor3 = Color3.fromRGB(180, 220, 255)
+    snow.ZIndex = 5
+    snow.Parent = Btn
+
+    -- Green glow for active
+    if isFirst then
+        local glow = Instance.new("UIStroke")
+        glow.Color = Color3.fromRGB(0, 255, 140)
+        glow.Thickness = 1.5
+        glow.Transparency = 0.3
+        glow.Parent = Btn
+    end
+
+    clickAnim(Btn)
+    TabBtnRefs[name] = Btn
+
+    local Page = Instance.new("Frame")
+    Page.Size = UDim2.new(1, -16, 1, -12)
+    Page.Position = UDim2.new(0, 8, 0, 6)
+    Page.BackgroundTransparency = 1
+    Page.Visible = isFirst
+    Page.ZIndex = 3
+    Page.Parent = ContentArea
+
+    if isFirst then activePage = Page end
+
+    Btn.MouseButton1Click:Connect(function()
+        if activePage == Page then return end
+        for _, c in pairs(ContentArea:GetChildren()) do
+            if c:IsA("Frame") then c.Visible = false end
+        end
+        for _, b in pairs(TabButtons:GetChildren()) do
+            if b:IsA("TextButton") then
+                TweenService:Create(b, TweenInfo.new(0.18), {
+                    BackgroundColor3 = Theme.Button,
+                    BackgroundTransparency = 0.12,
+                    TextColor3 = Theme.TextDark
+                }):Play()
+                local s = b:FindFirstChildOfClass("UIStroke")
+                if s then s:Destroy() end
+            end
+        end
+        TweenService:Create(Btn, TweenInfo.new(0.18), {
+            BackgroundColor3 = Color3.fromRGB(0, 180, 90),
+            BackgroundTransparency = 0,
+            TextColor3 = Color3.new(1,1,1)
+        }):Play()
+        local newGlow = Instance.new("UIStroke")
+        newGlow.Color = Color3.fromRGB(0, 255, 140)
+        newGlow.Thickness = 1.5
+        newGlow.Transparency = 0.3
+        newGlow.Parent = Btn
+        Page.Visible = true
+        activePage = Page
+    end)
+
+    return Page
+end
+
+local VehiclePage = createTab("Vehicle", "🚗", true)
+local HitsPage    = createTab("HITS", "🎵", false)
+local SoundsPage  = createTab("SOUNDS", "🔊", false)
+local SavedPage   = createTab("SAVED", "📁", false)
+local UpdatePage  = createTab("UPDATE", "🔄", false)
+local CreditsPage = createTab("CREDITS", "⭐", false)
+
+-- Merry Christmas Banner (bottom)
+local Banner = Instance.new("Frame")
+Banner.Size = UDim2.new(1, -20, 0, 34)
+Banner.Position = UDim2.new(0, 10, 1, -44)
+Banner.BackgroundColor3 = Color3.fromRGB(150, 25, 35)
+Banner.ZIndex = 4
+Banner.Parent = Main
+Instance.new("UICorner", Banner).CornerRadius = UDim.new(0, 10)
+
+local BannerStroke = Instance.new("UIStroke")
+BannerStroke.Color = Color3.fromRGB(255, 90, 90)
+BannerStroke.Thickness = 1.8
+BannerStroke.Transparency = 0.25
+BannerStroke.Parent = Banner
+
+local BannerText = Instance.new("TextLabel")
+BannerText.Size = UDim2.new(1, 0, 1, 0)
+BannerText.BackgroundTransparency = 1
+BannerText.Text = "🎁  Merry Christmas! Enjoy the Music!  🎄"
+BannerText.TextColor3 = Color3.fromRGB(255, 230, 170)
+BannerText.Font = Enum.Font.GothamBold
+BannerText.TextSize = 13
+BannerText.ZIndex = 5
+BannerText.Parent = Banner
+
+-- Small decorative elements on sides of banner
+local leftDeco = Instance.new("TextLabel")
+leftDeco.Size = UDim2.new(0, 30, 0, 30)
+leftDeco.Position = UDim2.new(0, 4, 0.5, -15)
+leftDeco.BackgroundTransparency = 1
+leftDeco.Text = "🎄"
+leftDeco.TextSize = 18
+leftDeco.ZIndex = 6
+leftDeco.Parent = Banner
+
+local rightDeco = Instance.new("TextLabel")
+rightDeco.Size = UDim2.new(0, 30, 0, 30)
+rightDeco.Position = UDim2.new(1, -34, 0.5, -15)
+rightDeco.BackgroundTransparency = 1
+rightDeco.Text = "🎁"
+rightDeco.TextSize = 18
+rightDeco.ZIndex = 6
+rightDeco.Parent = Banner
+
+-- ===================== THEME APPLY =====================
+local function ApplyTheme()
+    Theme = Themes[CurrentTheme]
+    Main.BackgroundColor3 = Theme.Bg
+    ContentArea.BackgroundColor3 = Theme.Content
+    Stroke.Color = Theme.Stroke
+    MinIcon.BackgroundColor3 = Theme.Accent
+end
+
+-- ==================== BACKEND (UNVERÄNDERT) ====================
+local RE = ReplicatedStorage:FindFirstChild("RE") or ReplicatedStorage:WaitForChild("RE", 5)
+local VehicleRemote = RE and RE:FindFirstChild("1NoMoto1rVehicle1s")
+local ClearRemote = RE and RE:FindFirstChild("1Clea1rTool1s")
+
+local RGBEnabled = false
+local SelectedVehicle = "SegwaySmall"
+
+local SavedPlaylist = {}
+local MaxSavedSongs = 30
+local SaveFileName = "SamMusicV6_Playlist.json"
+
+local function LoadSavedPlaylist()
+    pcall(function()
+        if readfile and isfile and isfile(SaveFileName) then
+            SavedPlaylist = HttpService:JSONDecode(readfile(SaveFileName)) or {}
+        end
+    end)
+end
+
+local function SavePlaylistToFile()
+    pcall(function()
+        if writefile then
+            writefile(SaveFileName, HttpService:JSONEncode(SavedPlaylist))
+        end
+    end)
+end
+
+LoadSavedPlaylist()
+
+local function SmartPlayMusic(id, vehicleType, useRGB)
+    if not VehicleRemote then return end
+    task.spawn(function()
+        RGBEnabled = false
+        VehicleRemote:FireServer("Delete NoMotorVehicle")
+        task.wait(0.2)
+        if ClearRemote then ClearRemote:FireServer("ClearAllTools") end
+        task.wait(0.2)
+        VehicleRemote:FireServer(vehicleType)
+        task.wait(1.0)
+        if useRGB then
+            RGBEnabled = true
+            task.spawn(function()
+                while RGBEnabled and task.wait(0.1) do
+                    local c = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                    local car = RE:FindFirstChild("1Player1sCa1r")
+                    if car then car:FireServer("NoMotorColor", c) end
+                end
+            end)
+        end
+        VehicleRemote:FireServer("PickingScooterMusicText", tostring(id))
+        task.wait(0.1)
+        VehicleRemote:FireServer("PickingScooterMusicText", tonumber(id))
+    end)
+end
+
+local function StopMusic()
+    RGBEnabled = false
+    if VehicleRemote then VehicleRemote:FireServer("Delete NoMotorVehicle") end
+    if ClearRemote then task.spawn(function() task.wait(0.1) ClearRemote:FireServer("ClearAllTools") end) end
+end
+
+-- Vehicle Tab (Layout & Größen exakt gleich)
+local function buildVehicleUI(page)
+    local IDBox = Instance.new("TextBox")
+    IDBox.Size = UDim2.new(1, 0, 0, 30)
+    IDBox.Position = UDim2.new(0, 0, 0, 6)
+    IDBox.BackgroundColor3 = Color3.fromRGB(20, 26, 38)
+    IDBox.PlaceholderText = "🎵  Enter Audio ID..."
+    IDBox.Text = ""
+    IDBox.TextColor3 = Theme.Text
+    IDBox.PlaceholderColor3 = Theme.TextDark
+    IDBox.Font = Enum.Font.Gotham
+    IDBox.TextSize = 13
+    IDBox.ZIndex = 4
+    IDBox.Parent = page
+    Instance.new("UICorner", IDBox).CornerRadius = UDim.new(0, 8)
+    local idStroke = Instance.new("UIStroke")
+    idStroke.Color = Color3.fromRGB(0, 170, 100)
+    idStroke.Thickness = 1.2
+    idStroke.Transparency = 0.4
+    idStroke.Parent = IDBox
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, 0, 0, 20)
+    lbl.Position = UDim2.new(0, 0, 0, 42)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = "🚗  Select Vehicle:"
+    lbl.TextColor3 = Theme.TextDark
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 12
+    lbl.ZIndex = 4
+    lbl.Parent = page
+
+    local skate = Instance.new("TextButton")
+    skate.Size = UDim2.new(0.48, 0, 0, 28)
+    skate.Position = UDim2.new(0, 0, 0, 66)
+    skate.BackgroundColor3 = Color3.fromRGB(0, 190, 90)
+    skate.Text = "🛹  Skateboard"
+    skate.TextColor3 = Color3.new(1,1,1)
+    skate.Font = Enum.Font.GothamBold
+    skate.TextSize = 12
+    skate.ZIndex = 4
+    skate.Parent = page
+    Instance.new("UICorner", skate).CornerRadius = UDim.new(0, 8)
+
+    local hover = Instance.new("TextButton")
+    hover.Size = UDim2.new(0.48, 0, 0, 28)
+    hover.Position = UDim2.new(0.52, 0, 0, 66)
+    hover.BackgroundColor3 = Theme.Button
+    hover.Text = "🛸  Hoverboard"
+    hover.TextColor3 = Theme.Text
+    hover.Font = Enum.Font.GothamBold
+    hover.TextSize = 12
+    hover.ZIndex = 4
+    hover.Parent = page
+    Instance.new("UICorner", hover).CornerRadius = UDim.new(0, 8)
+
+    skate.MouseButton1Click:Connect(function()
+        SelectedVehicle = "SkateBoard"
+        skate.BackgroundColor3 = Color3.fromRGB(0, 190, 90)
+        hover.BackgroundColor3 = Theme.Button
+        hover.TextColor3 = Theme.Text
+        skate.TextColor3 = Color3.new(1,1,1)
+    end)
+    hover.MouseButton1Click:Connect(function()
+        SelectedVehicle = "SegwaySmall"
+        hover.BackgroundColor3 = Color3.fromRGB(0, 190, 90)
+        skate.BackgroundColor3 = Theme.Button
+        skate.TextColor3 = Theme.Text
+        hover.TextColor3 = Color3.new(1,1,1)
+    end)
+
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Size = UDim2.new(1, 0, 1, -105)
+    scroll.Position = UDim2.new(0, 0, 0, 104)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 4
+    scroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 120)
+    scroll.ZIndex = 3
+    scroll.Parent = page
+    Instance.new("UIListLayout", scroll).Padding = UDim.new(0, 7)
+
+    local function makeBtn(text, color, rgb)
+        local b = Instance.new("TextButton")
+        b.Size = UDim2.new(1, -4, 0, 32)
+        b.BackgroundColor3 = color
+        b.Text = text
+        b.TextColor3 = Color3.new(1,1,1)
+        b.Font = Enum.Font.GothamBold
+        b.TextSize = 13
+        b.ZIndex = 4
+        b.Parent = scroll
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+        clickAnim(b)
+        b.MouseButton1Click:Connect(function()
+            SmartPlayMusic(IDBox.Text, SelectedVehicle, rgb)
+        end)
+    end
+
+    makeBtn("▶  Play Music", Color3.fromRGB(0, 170, 90), false)
+    makeBtn("★  Play with RGB", Color3.fromRGB(140, 50, 255), true)
+
+    local stop = Instance.new("TextButton")
+    stop.Size = UDim2.new(1, -4, 0, 32)
+    stop.BackgroundColor3 = Color3.fromRGB(200, 40, 50)
+    stop.Text = "■  Stop Music"
+    stop.TextColor3 = Color3.new(1,1,1)
+    stop.Font = Enum.Font.GothamBold
+    stop.TextSize = 13
+    stop.ZIndex = 4
+    stop.Parent = scroll
+    Instance.new("UICorner", stop).CornerRadius = UDim.new(0, 8)
+    clickAnim(stop)
+    stop.MouseButton1Click:Connect(StopMusic)
+
+    scroll.CanvasSize = UDim2.new(0, 0, 0, 120)
+end
+
+buildVehicleUI(VehiclePage)
+
+-- ===================== HITS =====================
+local HitsSongs = {
+    {"Mommyy", "112429422439068"},
+    {"I Got You Baby", "115492336583856"},
+    {"Alone", "105512964264815"},
+    {"Another World", "111351357978027"},
+    {"Under the Influence", "103222441664136"},
+    {"No Copyright", "72031945149756"},
+    {"Clean Drop", "97491944760306"},
+    {"Night Drive", "113737237426134"},
+    {"Soft Rage", "105158334993991"},
+    {"Midnight Heat", "78015487317045"},
+    {"Ghost Mode", "80442979651569"},
+    {"Lowkey Flex", "128961712071619"},
+    {"After Hours", "110152577760152"},
+    {"Dark Pulse", "120871403922972"},
+    {"Silent Killer", "91301048841024"},
+    {"Cold Blooded", "111205815697819"},
+    {"Stadium Rave", "1846368080"},
+    {"Summer Heat", "1844422218"},
+    {"Hard Bounce", "117206383809583"},
+    {"Pure Chaos", "86503267790406"},
+    {"Late Night", "78625674962793"},
+    {"Wake Up Hardtekk", "70969700953846"},
+    {"Obligatory Hardtekk", "100825248589453"},
+    {"German Anthem", "1838111511"},
+    {"Shape Of You", "101465201102170"},
+    {"Hard Pulse", "1839246774"},
+    {"Dropsik Bass", "77396545462103"},
+    {"New Hardtekk", "122542000297473"},
+    {"Erika", "89197604862010"},
+    {"kaa", "84026997473821"},
+    {"bayern", "132965113038362"},
+    {"hard", "132151809709601"},
+    {"Musik 1", "110711237943833"},
+    {"Musik 2", "96935838873113"},
+    {"Last Christmas", "103870757830875"},
+    {"Snowy", "76276508722272"},
+    {"Christmas Song", "1839285792"},
+    {"Jingle Bells EDM", "9046954223"},
+    {"III Christmas", "107680643599564"},
+    {"Christmas Beat III", "1838667168"},
+    {"Christmas Bells III", "1841342574"},
+}
+
+-- ===================== SOUNDS =====================
+local SoundsSongs = {
+    {"Sound1", "7772283448"},
+    {"Sound2", "6332053702"},
+    {"Sound3", "139056779819258"},
+    {"Sound4", "112599888154205"},
+    {"Sound5", "6700501985"},
+    {"Sound6", "18623229993"},
+    {"Sound7", "8983177095"},
+    {"Sound8", "5303371139"},
+    {"Sound9", "6729922069"},
+    {"Sound10", "5153845714"},
+    {"Sound11", "8388105535"},
+    {"Sound12", "8647630325"},
+    {"Sound13", "7361042352"},
+    {"Sound14", "1626996526"},
+}
+
+local function buildMusicTab(page, songList)
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Size = UDim2.new(1, 0, 1, -8)
+    scroll.Position = UDim2.new(0, 0, 0, 4)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 4
+    scroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 120)
+    scroll.ZIndex = 3
+    scroll.Parent = page
+    Instance.new("UIListLayout", scroll).Padding = UDim.new(0, 6)
+
+    for _, song in ipairs(songList) do
+        local entry = Instance.new("Frame")
+        entry.Size = UDim2.new(1, -4, 0, 32)
+        entry.BackgroundColor3 = Color3.fromRGB(22, 28, 40)
+        entry.ZIndex = 4
+        entry.Parent = scroll
+        Instance.new("UICorner", entry).CornerRadius = UDim.new(0, 8)
+
+        local entryStroke = Instance.new("UIStroke")
+        entryStroke.Color = Color3.fromRGB(0, 140, 90)
+        entryStroke.Thickness = 1
+        entryStroke.Transparency = 0.7
+        entryStroke.Parent = entry
+
+        local namelbl = Instance.new("TextLabel")
+        namelbl.Size = UDim2.new(0.58, 0, 1, 0)
+        namelbl.Position = UDim2.new(0, 10, 0, 0)
+        namelbl.BackgroundTransparency = 1
+        namelbl.Text = "❄  " .. song[1]
+        namelbl.TextColor3 = Theme.Text
+        namelbl.Font = Enum.Font.Gotham
+        namelbl.TextSize = 12
+        namelbl.TextXAlignment = Enum.TextXAlignment.Left
+        namelbl.ZIndex = 5
+        namelbl.Parent = entry
+
+        local play = Instance.new("TextButton")
+        play.Size = UDim2.new(0, 26, 0, 22)
+        play.Position = UDim2.new(1, -60, 0.5, -11)
+        play.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
+        play.Text = "▶"
+        play.TextColor3 = Color3.new(1,1,1)
+        play.Font = Enum.Font.GothamBold
+        play.TextSize = 12
+        play.ZIndex = 5
+        play.Parent = entry
+        Instance.new("UICorner", play).CornerRadius = UDim.new(0, 6)
+        clickAnim(play)
+        play.MouseButton1Click:Connect(function()
+            SmartPlayMusic(tostring(song[2]), SelectedVehicle, false)
+        end)
+
+        local save = Instance.new("TextButton")
+        save.Size = UDim2.new(0, 26, 0, 22)
+        save.Position = UDim2.new(1, -30, 0.5, -11)
+        save.BackgroundColor3 = Color3.fromRGB(255, 160, 30)
+        save.Text = "💾"
+        save.TextColor3 = Color3.new(1,1,1)
+        save.Font = Enum.Font.GothamBold
+        save.TextSize = 12
+        save.ZIndex = 5
+        save.Parent = entry
+        Instance.new("UICorner", save).CornerRadius = UDim.new(0, 6)
+        clickAnim(save)
+        save.MouseButton1Click:Connect(function()
+            if #SavedPlaylist < MaxSavedSongs then
+                table.insert(SavedPlaylist, {name = song[1], id = tostring(song[2])})
+                SavePlaylistToFile()
+                buildSavedUI(SavedPage)
+            end
+        end)
+    end
+    scroll.CanvasSize = UDim2.new(0, 0, 0, #songList * 38)
+end
+
+buildMusicTab(HitsPage, HitsSongs)
+buildMusicTab(SoundsPage, SoundsSongs)
+
+-- Saved Tab
+function buildSavedUI(page)
+    for _, c in pairs(page:GetChildren()) do
+        if c:IsA("Frame") or c:IsA("ScrollingFrame") or c:IsA("TextLabel") then c:Destroy() end
+    end
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 24)
+    title.Position = UDim2.new(0, 0, 0, 4)
+    title.BackgroundTransparency = 1
+    title.Text = "📁  Saved Songs (" .. #SavedPlaylist .. "/" .. MaxSavedSongs .. ")"
+    title.TextColor3 = Theme.Accent
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 13
+    title.ZIndex = 4
+    title.Parent = page
+
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Size = UDim2.new(1, 0, 1, -32)
+    scroll.Position = UDim2.new(0, 0, 0, 30)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 4
+    scroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 120)
+    scroll.ZIndex = 3
+    scroll.Parent = page
+    Instance.new("UIListLayout", scroll).Padding = UDim.new(0, 6)
+
+    if #SavedPlaylist == 0 then
+        local empty = Instance.new("TextLabel")
+        empty.Size = UDim2.new(1, 0, 0, 50)
+        empty.BackgroundTransparency = 1
+        empty.Text = "No saved songs yet!\nClick 💾 in HITS or SOUNDS"
+        empty.TextColor3 = Theme.TextDark
+        empty.Font = Enum.Font.Gotham
+        empty.TextSize = 12
+        empty.TextWrapped = true
+        empty.ZIndex = 4
+        empty.Parent = scroll
+        return
+    end
+
+    for i, song in ipairs(SavedPlaylist) do
+        local entry = Instance.new("Frame")
+        entry.Size = UDim2.new(1, -4, 0, 32)
+        entry.BackgroundColor3 = Color3.fromRGB(22, 28, 40)
+        entry.ZIndex = 4
+        entry.Parent = scroll
+        Instance.new("UICorner", entry).CornerRadius = UDim.new(0, 8)
+
+        local namelbl = Instance.new("TextLabel")
+        namelbl.Size = UDim2.new(0.5, 0, 1, 0)
+        namelbl.Position = UDim2.new(0, 10, 0, 0)
+        namelbl.BackgroundTransparency = 1
+        namelbl.Text = "❄  " .. song.name
+        namelbl.TextColor3 = Theme.Text
+        namelbl.Font = Enum.Font.Gotham
+        namelbl.TextSize = 12
+        namelbl.TextXAlignment = Enum.TextXAlignment.Left
+        namelbl.ZIndex = 5
+        namelbl.Parent = entry
+
+        local play = Instance.new("TextButton")
+        play.Size = UDim2.new(0, 26, 0, 22)
+        play.Position = UDim2.new(1, -60, 0.5, -11)
+        play.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
+        play.Text = "▶"
+        play.TextColor3 = Color3.new(1,1,1)
+        play.Font = Enum.Font.GothamBold
+        play.TextSize = 12
+        play.ZIndex = 5
+        play.Parent = entry
+        Instance.new("UICorner", play).CornerRadius = UDim.new(0, 6)
+        clickAnim(play)
+        play.MouseButton1Click:Connect(function()
+            SmartPlayMusic(song.id, SelectedVehicle, false)
+        end)
+
+        local deleteBtn = Instance.new("TextButton")
+        deleteBtn.Size = UDim2.new(0, 26, 0, 22)
+        deleteBtn.Position = UDim2.new(1, -30, 0.5, -11)
+        deleteBtn.BackgroundColor3 = Theme.Danger
+        deleteBtn.Text = "✕"
+        deleteBtn.TextColor3 = Color3.new(1,1,1)
+        deleteBtn.Font = Enum.Font.GothamBold
+        deleteBtn.TextSize = 13
+        deleteBtn.ZIndex = 5
+        deleteBtn.Parent = entry
+        Instance.new("UICorner", deleteBtn).CornerRadius = UDim.new(0, 6)
+        clickAnim(deleteBtn)
+
+        deleteBtn.MouseButton1Click:Connect(function()
+            table.remove(SavedPlaylist, i)
+            SavePlaylistToFile()
+            buildSavedUI(page)
+        end)
+    end
+    scroll.CanvasSize = UDim2.new(0, 0, 0, #SavedPlaylist * 38)
+end
+
+buildSavedUI(SavedPage)
+
+-- Update Tab
+local function buildUpdateUI(page)
+    for _, c in pairs(page:GetChildren()) do
+        c:Destroy()
+    end
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 28)
+    title.Position = UDim2.new(0, 6, 0, 6)
+    title.BackgroundTransparency = 1
+    title.Text = "🎄  V6.2 Christmas Update"
+    title.TextColor3 = Theme.Accent
+    title.Font = Enum.Font.GothamBlack
+    title.TextSize = 15
+    title.ZIndex = 4
+    title.Parent = page
+
+    local text = Instance.new("TextLabel")
+    text.Size = UDim2.new(1, -12, 0, 120)
+    text.Position = UDim2.new(0, 6, 0, 40)
+    text.BackgroundTransparency = 1
+    text.Text = "• Full Christmas Redesign\n• Fullscreen falling snowflakes\n• Flying Santa + Reindeer Sleigh\n• Garland lights & decorations\n• Enhanced glows & snow edges\n• Merry Christmas Banner"
+    text.TextColor3 = Theme.Text
+    text.Font = Enum.Font.Gotham
+    text.TextSize = 13
+    text.TextXAlignment = Enum.TextXAlignment.Left
+    text.TextYAlignment = Enum.TextYAlignment.Top
+    text.TextWrapped = true
+    text.ZIndex = 4
+    text.Parent = page
+
+    local themeBtn = Instance.new("TextButton")
+    themeBtn.Size = UDim2.new(1, -12, 0, 36)
+    themeBtn.Position = UDim2.new(0, 6, 0, 170)
+    themeBtn.BackgroundColor3 = Theme.Button
+    themeBtn.Text = CurrentTheme == "Dark" and "🌙  Dark Mode  →  Light" or "☀️  Light Mode  →  Dark"
+    themeBtn.TextColor3 = Theme.Text
+    themeBtn.Font = Enum.Font.GothamBold
+    themeBtn.TextSize = 13
+    themeBtn.ZIndex = 4
+    themeBtn.Parent = page
+    Instance.new("UICorner", themeBtn).CornerRadius = UDim.new(0, 8)
+    clickAnim(themeBtn)
+
+    themeBtn.MouseButton1Click:Connect(function()
+        CurrentTheme = CurrentTheme == "Dark" and "Light" or "Dark"
+        ApplyTheme()
+        buildUpdateUI(page)
+        buildSavedUI(SavedPage)
+    end)
+end
+
+buildUpdateUI(UpdatePage)
+
+-- Credits Tab
+local function buildCreditsUI(page)
+    local t = Instance.new("TextLabel")
+    t.Size = UDim2.new(1, 0, 0, 30)
+    t.Position = UDim2.new(0, 8, 0, 8)
+    t.BackgroundTransparency = 1
+    t.Text = "⭐  Credits"
+    t.TextColor3 = Theme.Accent
+    t.Font = Enum.Font.GothamBlack
+    t.TextSize = 16
+    t.ZIndex = 4
+    t.Parent = page
+
+    local l1 = Instance.new("TextLabel")
+    l1.Size = UDim2.new(1, -16, 0, 24)
+    l1.Position = UDim2.new(0, 8, 0, 48)
+    l1.BackgroundTransparency = 1
+    l1.Text = "🎅  SamBlox (Iostein_cool) – Hub & Script"
+    l1.TextColor3 = Theme.Text
+    l1.Font = Enum.Font.Gotham
+    l1.TextSize = 13
+    l1.TextXAlignment = Enum.TextXAlignment.Left
+    l1.TextWrapped = true
+    l1.ZIndex = 4
+    l1.Parent = page
+
+    local l2 = Instance.new("TextLabel")
+    l2.Size = UDim2.new(1, -16, 0, 24)
+    l2.Position = UDim2.new(0, 8, 0, 78)
+    l2.BackgroundTransparency = 1
+    l2.Text = "🎄  Rosti (Rostam7486) – Best Friend"
+    l2.TextColor3 = Theme.Text
+    l2.Font = Enum.Font.Gotham
+    l2.TextSize = 13
+    l2.TextXAlignment = Enum.TextXAlignment.Left
+    l2.TextWrapped = true
+    l2.ZIndex = 4
+    l2.Parent = page
+
+    local l3 = Instance.new("TextLabel")
+    l3.Size = UDim2.new(1, -16, 0, 24)
+    l3.Position = UDim2.new(0, 8, 0, 110)
+    l3.BackgroundTransparency = 1
+    l3.Text = "❄  Merry Christmas everyone!"
+    l3.TextColor3 = Color3.fromRGB(255, 180, 100)
+    l3.Font = Enum.Font.GothamBold
+    l3.TextSize = 13
+    l3.TextXAlignment = Enum.TextXAlignment.Left
+    l3.ZIndex = 4
+    l3.Parent = page
+end
+
+buildCreditsUI(CreditsPage)
+
+print("✅ Sam's Music V6.2 Christmas Version loaded")
