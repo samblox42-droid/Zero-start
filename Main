@@ -489,6 +489,11 @@ local HitsSongs = {
     {"Musik 2", "96935838873113"},
     {"Last Christmas", "103870757830875"},
     {"Snowy", "76276508722272"},
+    {"Christmas Song", "1839285792"},
+    {"Jingle Bells EDM", "9046954223"},
+    {"III Christmas", "107680643599564"},
+    {"Christmas Beat III", "1838667168"},
+    {"Christmas Bells III", "1841342574"},
 }
 
 -- ===================== SOUNDS =====================
